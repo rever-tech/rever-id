@@ -16,7 +16,7 @@ class IdMappingControllerTest extends FeatureTest {
   override protected def server = new EmbeddedThriftServer(twitterServer = new Server)
 
   lazy val clientService = ClientBuilder()
-    .hosts(Seq(new InetSocketAddress("172.16.100.1", 10084)))
+    .hosts(Seq(new InetSocketAddress("localhost", server.thriftExternalPort)))
     .codec(ThriftClientFramedCodec())
     .hostConnectionLimit(1)
     .build()
