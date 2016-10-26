@@ -1,19 +1,12 @@
 package rever.id.domain
 
-import com.twitter.util.Future
-import rever.id.domain.thrift.{TUserID, TUserInfo}
+import rever.id.domain.thrift.{TIdAddResp, TIdGetResp, TIdStatus}
 
 /**
   * Created by SangDang on 9/16/16.
   */
 object ThriftImplicit {
-  implicit def T2UserId(tUserID: TUserID): UserID = UserID(tUserID.id)
-
-  implicit def T2UserInfo(tUserInfo: TUserInfo): UserInfo = UserInfo(tUserInfo._1, tUserInfo.username, tUserInfo.age, tUserInfo.sex)
-
-  implicit def UserId2T(userID: UserID): TUserID = TUserID(userID.id)
-
-  implicit def UserInfo2T(userInfo: UserInfo): TUserInfo = TUserInfo(userInfo.userID, userInfo.userName, userInfo.age, userInfo.sex)
-
-  implicit def Future2T(fUserInfo: Future[UserInfo]): Future[TUserInfo] = fUserInfo.map(x => x)
+  implicit def IdStatus2T (idStatus : IdStatus) : TIdStatus = TIdStatus(idStatus.exist, idStatus.suggest)
+  implicit def IdAddResp2T(addResp : IdAddResp) : TIdAddResp = TIdAddResp(addResp.isOk, addResp.id)
+  implicit def IdGetResp2T(getResp : IdGetResp) : TIdGetResp = TIdGetResp(getResp.exist, getResp.id)
 }
