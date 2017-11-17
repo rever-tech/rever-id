@@ -76,12 +76,15 @@ case class IdMappingServiceImpl @Inject()() extends IdMappingService {
   }
 
   override def update(prettyId: String, id: String): Future[IdUpdateResp] = futurePool {
-    ssdbClient.get(prettyId, id)
-  }.map(resp => if (resp.notFound()) { IdUpdateResp(isOk = false, None, None)} else {
-    val addResp = ssdbClient.set(prettyId, id)
-    if (addResp.ok()) IdUpdateResp(isOk = true, Option(id), Option(resp.asString()))
-    else IdUpdateResp(isOk = false, None, Option(resp.asString()))
-  })
+    ssdbClient.get(prettyId)
+  }.map(resp =>
+    if (resp.notFound()) {
+      IdUpdateResp(isOk = false, None, None)
+    } else {
+      val addResp = ssdbClient.set(prettyId, id)
+      if (addResp.ok()) IdUpdateResp(isOk = true, Option(id), Option(resp.asString()))
+      else IdUpdateResp(isOk = false, None, Option(resp.asString()))
+    })
 
   override def checkMulti(ids: Seq[String]): Future[Map[String, IdStatus]] = futurePool {
     ids.map(id => {
