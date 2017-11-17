@@ -64,6 +64,25 @@ class IdMappingControllerTest extends FeatureTest {
     }
   }
 
+  "[Thrift] Update an exist id" should {
+    "successful" in {
+      val update = client.updatePrettyIdWithUid("exist_id", "1234").value
+      update.isOk should equal(true)
+      update.id.isDefined should equal(true)
+      update.id.get should equal("1234")
+      update.oldId.isDefined should equal(true)
+    }
+  }
+
+  "[Thrift] Update an not exist id" should {
+    "return fail" in {
+      val update = client.updatePrettyIdWithUid("exist_id2342", "1234").value
+      update.isOk should equal(true)
+      update.id.isDefined should equal(false)
+      update.oldId.isDefined should equal(false)
+    }
+  }
+
   "[Thrift] Add Id" should {
     "successful" in {
       client.deleteId("add_id").value should equal(true)

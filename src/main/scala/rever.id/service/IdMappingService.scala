@@ -5,7 +5,7 @@ import java.util.UUID
 import com.google.inject.Inject
 import com.twitter.util.Future
 import org.nutz.ssdb4j.SSDBs
-import rever.id.domain.{IdAddResp, IdGetResp, IdStatus}
+import rever.id.domain.{IdAddResp, IdGetResp, IdStatus, IdUpdateResp}
 import rever.id.util.ZConfig
 
 /**
@@ -19,6 +19,8 @@ trait IdMappingService {
   def add(prettyId: String): Future[IdAddResp]
 
   def add(prettyId: String, id: String): Future[IdAddResp]
+
+  def update(prettyId: String, newId: String): Future[IdUpdateResp]
 
   def addMulti(prettyIds: Seq[String]): Future[IdAddResp]
 
@@ -73,11 +75,23 @@ case class IdMappingServiceImpl @Inject()() extends IdMappingService {
     }
   }
 
+  override def update(prettyId: String, id: String): Future[IdUpdateResp] = futurePool {
+    ssdbClient.get(prettyId, id)
+  }.map(resp => if (resp.notFound()) { IdUpdateResp(isOk = false, None, None)} else {
+    val addResp = ssdbClient.set(prettyId, id)
+    if (addResp.ok()) IdUpdateResp(isOk = true, Option(id), Option(resp.asString()))
+    else IdUpdateResp(isOk = false, None, Option(resp.asString()))
+  })
+
   override def checkMulti(ids: Seq[String]): Future[Map[String, IdStatus]] = futurePool {
     ids.map(id => {
       val resp = ssdbClient.exists(id)
       val status = (resp.ok(), resp.asInt()) match {
-        case (true, 1) => IdStatus(exist = true, Option(s"${id}_${System.currentTimeMillis()}"))
+        case (true, 1) => IdStatus(exist = true, Option(s"${
+          id
+        }_${
+          System.currentTimeMillis()
+        }"))
         case (true, 0) => IdStatus(exist = false, None)
         case _ => throw new Exception("SSDB Client response failure")
       }

@@ -14,3 +14,9 @@ struct TIdGetResp {
     1: required bool exist,
     2: optional string id
 }
+
+struct TIdUpdateResp {
+    1: required bool isOk,
+    2: optional string id,
+    3: optional string oldId
+}

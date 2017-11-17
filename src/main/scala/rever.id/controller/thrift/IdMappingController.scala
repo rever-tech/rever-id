@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import com.twitter.finatra.thrift.Controller
 import com.twitter.inject.Logging
 import rever.id.domain.ThriftImplicit._
-import rever.id.service.TIdMappingService.{AddId, AddPrettyIdWithUid, Check, DeleteId, GetId, Mcheck}
+import rever.id.service.TIdMappingService.{AddId, AddPrettyIdWithUid, Check, DeleteId, GetId, Mcheck, UpdatePrettyIdWithUid}
 import rever.id.service.{IdMappingService, TIdMappingService}
 
 /**
@@ -34,6 +34,12 @@ class IdMappingController @Inject()(service : IdMappingService) extends Controll
   override val addPrettyIdWithUid = handle(AddPrettyIdWithUid) { args :AddPrettyIdWithUid.Args => {
     service.add(args.prettyId, args.id).map(resp => resp)
   }}
+
+  override val updatePrettyIdWithUid = handle(UpdatePrettyIdWithUid) { args: UpdatePrettyIdWithUid.Args => {
+    service.update(args.prettyId, args.newId).map(resp => resp)
+  }
+
+  }
 
   override val getId = handle(GetId) { args :GetId.Args => {
     service.get(args.prettyId).map(resp => resp)
